@@ -1,19 +1,18 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repository.RoleRepository;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
-import java.security.Principal;
+import java.util.List;
 
 
-@Controller
+@RestController
 @RequestMapping("/admin")
 public class AdminController {
 
@@ -27,31 +26,32 @@ public class AdminController {
         this.roleRepository = roleRepository;
     }
 
-    @GetMapping()
-    public String showAdmin(@AuthenticationPrincipal User user, Model model) {
-        model.addAttribute("admin", userService.getUserById(1L));
-        model.addAttribute("users", userService.getAllUsers());
-        model.addAttribute("userLogin", user);
-        model.addAttribute("listRoles", roleRepository.findAll());
-        return "admin";
+    @GetMapping("/allUsers")
+    public ResponseEntity<List<User>> showAllUsers() {
+        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<User> showAuthenticatedUser(@AuthenticationPrincipal User user) {
+        return new ResponseEntity<>(userService.findByUsername(user.getName()), HttpStatus.OK);
     }
 
     @PostMapping("/create")
-    public String create(@ModelAttribute("user") User user) {
+    public ResponseEntity<User> createUser(@RequestBody User user) {
         userService.saveUser(user);
-        return "redirect:/admin";
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PostMapping("/update")
-    public String updateUser(@ModelAttribute("user") User user) {
+    @PutMapping("/update")
+    public ResponseEntity<User> updateUser(@RequestBody User user) {
         userService.updateUser(user);
-        return "redirect:/admin";
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PostMapping("/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Long> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
-        return "redirect:/admin";
+        return new ResponseEntity<>(id, HttpStatus.OK);
     }
 }
 

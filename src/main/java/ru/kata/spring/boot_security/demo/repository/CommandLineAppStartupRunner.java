@@ -28,7 +28,7 @@ public class CommandLineAppStartupRunner {
         Set<Role> adminRoles = new HashSet<>();
         adminRoles.add(role);
         User admin = new User();
-        admin.setName("admin");
+        admin.setFirstName("admin");
         admin.setLastName("adminov");
         admin.setUsername("admin");
         admin.setPassword(bCryptPasswordEncoder.encode("admin"));
